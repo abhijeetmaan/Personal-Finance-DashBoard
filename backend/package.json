@@ -1,0 +1,33 @@
+{
+    "name": "personal-finance-dashboard-backend",
+    "version": "1.0.0",
+    "description": "Production-ready backend for Personal Finance Dashboard",
+    "main": "src/server.js",
+    "type": "module",
+    "scripts": {
+        "dev": "nodemon src/server.js",
+        "start": "node src/server.js"
+    },
+    "keywords": [
+        "finance",
+        "dashboard",
+        "express",
+        "mongodb",
+        "mongoose"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "cors": "^2.8.6",
+        "dotenv": "^16.6.1",
+        "express": "^4.22.1",
+        "express-rate-limit": "^8.4.1",
+        "helmet": "^7.1.0",
+        "mongoose": "^8.23.1",
+        "morgan": "^1.10.0",
+        "socket.io": "^4.8.3"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.14"
+    }
+}

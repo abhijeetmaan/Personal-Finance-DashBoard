@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer components {
+  /** Typography scale — use for consistent hierarchy */
+  .type-heading {
+    @apply text-2xl font-semibold text-slate-900 dark:text-white;
+  }
+
+  .type-subheading {
+    @apply text-lg font-medium text-slate-800 dark:text-slate-100;
+  }
+
+  .type-body {
+    @apply text-sm text-gray-500 dark:text-gray-400;
+  }
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  background-color: #f4f7fb;
+  background-image:
+    radial-gradient(
+      ellipse 120% 80% at 100% -20%,
+      rgba(99, 102, 241, 0.12),
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 100% 60% at 0% 100%,
+      rgba(20, 184, 166, 0.1),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(139, 92, 246, 0.06),
+      transparent 55%
+    ),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgba(148, 163, 184, 0.35) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+  opacity: 0.45;
+  z-index: 0;
+}
+
+.dark .app-shell {
+  background-color: #0f172a;
+  background-image:
+    radial-gradient(
+      ellipse 120% 80% at 100% -20%,
+      rgba(99, 102, 241, 0.18),
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 100% 60% at 0% 100%,
+      rgba(20, 184, 166, 0.12),
+      transparent 45%
+    ),
+    linear-gradient(180deg, #0f172a 0%, #020617 100%);
+}
+
+.dark .app-shell::before {
+  opacity: 0.2;
+  background-image: radial-gradient(
+    rgba(148, 163, 184, 0.15) 1px,
+    transparent 1px
+  );
+}
+
+.recharts-cartesian-axis-tick-value,
+.recharts-legend-item-text {
+  fill: #64748b;
+}
+
+.dark .recharts-cartesian-axis-tick-value,
+.dark .recharts-legend-item-text {
+  fill: #94a3b8;
+}
