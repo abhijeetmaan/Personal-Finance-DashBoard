@@ -1,8 +1,15 @@
 import mongoose from "mongoose";
+import { env } from "./env.js";
 import { Budget } from "../models/Budget.js";
 import { Category } from "../models/Category.js";
 import { LedgerEntry } from "../models/LedgerEntry.js";
 import { backfillLedgerFromAllTransactions } from "../services/ledger.service.js";
+
+/** Log URI without credentials (for Render logs). */
+function describeMongoUri(uri) {
+  if (!uri) return "(missing)";
+  return uri.replace(/\/\/([^@]+)@/, "//***:***@");
+}
 
 const migrateBudgetCollection = async () => {
   try {
@@ -63,18 +70,23 @@ const maybeBackfillLedger = async () => {
 
 const connectDB = async () => {
   try {
-    if (!process.env.MONGO_URI) {
-      throw new Error("MONGO_URI is not defined");
-    }
-
-    console.log("Connecting to MongoDB...");
+    console.log("Connecting to MongoDB...", describeMongoUri(env.mongoUri));
     mongoose.set("strictQuery", true);
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(env.mongoUri, {
+      serverSelectionTimeoutMS: 25_000,
+      maxPoolSize: 10,
+    });
     await migrateBudgetCollection();
     await maybeBackfillLedger();
     console.log("MongoDB connected");
   } catch (error) {
-    console.error("MongoDB connection error:", error.message);
+    console.error("MongoDB connection failed.");
+    console.error("URI (redacted):", describeMongoUri(env.mongoUri));
+    console.error("Error:", error.message);
+    if (error.reason) console.error("Reason:", String(error.reason));
+    console.error(
+      "Fix: In MongoDB Atlas → Network Access, allow 0.0.0.0/0 (or Render outbound IPs). Confirm user/password and database name in the connection string. Use env name MONGO_URI or MONGODB_URI on Render.",
+    );
     process.exit(1);
   }
 };

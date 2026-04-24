@@ -4,12 +4,14 @@ dotenv.config();
 
 const nodeEnv = process.env.NODE_ENV || "development";
 
-const requiredEnvVars = ["MONGO_URI"];
-requiredEnvVars.forEach((envVar) => {
-  if (!process.env[envVar]) {
-    throw new Error(`Missing required environment variable: ${envVar}`);
-  }
-});
+const mongoUri =
+  process.env.MONGO_URI?.trim() || process.env.MONGODB_URI?.trim();
+
+if (!mongoUri) {
+  throw new Error(
+    "Missing MONGO_URI or MONGODB_URI. Add your MongoDB connection string in Render → Environment.",
+  );
+}
 
 const rawClientUrl =
   process.env.CLIENT_URL?.trim() || process.env.CORS_ORIGIN?.trim();
@@ -43,7 +45,7 @@ if (rawClientUrl === "*") {
 export const env = {
   nodeEnv,
   port: Number(process.env.PORT) || 5000,
-  mongoUri: process.env.MONGO_URI,
+  mongoUri,
   corsOrigins,
   corsCredentials,
 };
