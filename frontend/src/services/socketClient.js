@@ -1,8 +1,8 @@
 import { io } from "socket.io-client";
-import { getBackendOrigin } from "../config/api.js";
+import { API_BASE_URL } from "../config/api.js";
 
 const socketUrl =
-  import.meta.env.VITE_SOCKET_URL?.trim() || getBackendOrigin();
+  import.meta.env.VITE_SOCKET_URL?.trim() || API_BASE_URL;
 
 export const createFinanceSocket = () =>
   io(socketUrl, {

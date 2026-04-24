@@ -1,10 +1,10 @@
 const trimTrailingSlashes = (value) => String(value || "").replace(/\/+$/, "");
 
 /**
- * Backend origin only (no /api/v1). Prefer VITE_API_URL in production.
- * VITE_API_BASE_URL is supported for backwards compatibility when it includes /api/v1.
+ * Backend origin only (no `/api/v1`). Set `VITE_API_URL` in `.env` or on Vercel.
+ * Legacy: `VITE_API_BASE_URL` may include `/api/v1`; we normalize to origin.
  */
-export function getBackendOrigin() {
+function resolveApiBaseUrl() {
   const fromEnv = import.meta.env.VITE_API_URL?.trim();
   if (fromEnv) {
     return trimTrailingSlashes(fromEnv);
@@ -23,13 +23,22 @@ export function getBackendOrigin() {
       const basePath = path && path !== "/" ? path : "";
       return trimTrailingSlashes(`${url.origin}${basePath}`);
     } catch {
-      // fall through to default
+      // fall through
     }
   }
 
   return "http://localhost:5000";
 }
 
+export const API_BASE_URL = resolveApiBaseUrl();
+
+/** Use for REST paths: `${API_V1_BASE_URL}/transactions` or axios baseURL. */
+export const API_V1_BASE_URL = `${API_BASE_URL}/api/v1`;
+
+export function getBackendOrigin() {
+  return API_BASE_URL;
+}
+
 export function getApiBaseUrl() {
-  return `${getBackendOrigin()}/api/v1`;
+  return API_V1_BASE_URL;
 }
