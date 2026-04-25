@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { env } from "../config/env.js";
+import { createCorsOriginCallback } from "../utils/corsOrigin.js";
 
 export let io = null;
 
@@ -10,8 +11,10 @@ export const initSocket = (httpServer) => {
     env.corsOrigins === "*"
       ? { origin: "*", credentials: false }
       : {
-          origin: env.corsOrigins,
-          credentials: env.corsCredentials,
+          origin: createCorsOriginCallback(env.corsOrigins, {
+            allowVercelSubdomains: env.corsAllowVercelSubdomains,
+          }),
+          credentials: true,
         };
 
   io = new Server(httpServer, {

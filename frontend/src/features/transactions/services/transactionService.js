@@ -1,3 +1,4 @@
+// HTTP base: src/config/api.js → apiClient (never relative /api/v1 URLs)
 import apiClient from "../../../services/apiClient";
 
 export const transactionService = {

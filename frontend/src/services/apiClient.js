@@ -1,6 +1,10 @@
 import axios from "axios";
 import { API_V1_BASE_URL } from "../config/api.js";
 
+/**
+ * All REST calls use `API_V1_BASE_URL` (see `src/config/api.js`) via this instance.
+ * Feature services should import `apiClient` here — not raw URLs.
+ */
 const apiClient = axios.create({
   baseURL: API_V1_BASE_URL,
   timeout: 10_000,
@@ -14,8 +18,9 @@ apiClient.interceptors.response.use(
     const message =
       dataMessage ||
       (status === 403
-        ? "API forbidden — check backend CLIENT_URL (CORS) and VITE_API_URL"
+        ? "API forbidden — set Render CLIENT_URL to your Vercel origin and redeploy backend"
         : null) ||
+      (status === 404 ? "API request failed — not found" : null) ||
       error.message ||
       "API request failed";
 
@@ -29,7 +34,6 @@ apiClient.interceptors.response.use(
   },
 );
 
-/** Alias matching common naming; same instance as default export. */
 export const api = apiClient;
 
 export default apiClient;

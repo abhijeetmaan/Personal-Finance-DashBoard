@@ -1,11 +1,13 @@
+/** Disable PWA service worker so `/api/*` is never intercepted on the SPA origin. */
 export const registerServiceWorker = () => {
-  if (!("serviceWorker" in navigator) || import.meta.env.DEV) {
+  if (!("serviceWorker" in navigator)) {
     return;
   }
 
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {
-      // Ignore registration failures in restricted environments.
-    });
-  });
+  navigator.serviceWorker
+    .getRegistrations()
+    .then((regs) => {
+      regs.forEach((r) => r.unregister());
+    })
+    .catch(() => {});
 };

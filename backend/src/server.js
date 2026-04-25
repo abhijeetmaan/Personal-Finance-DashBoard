@@ -14,8 +14,12 @@ const startServer = async () => {
     initSocket(httpServer);
 
     httpServer.listen(env.port, () => {
+      const corsNote =
+        env.corsOrigins === "*"
+          ? "CORS: *"
+          : `CORS: ${env.corsOrigins.length} allowlist + vercel.app=${env.corsAllowVercelSubdomains}`;
       console.log(
-        `API listening on port ${env.port} (${env.nodeEnv}) — health: /api/v1/health`,
+        `API listening on port ${env.port} (${env.nodeEnv}) — health: /api/v1/health — ${corsNote}`,
       );
     });
   } catch (error) {

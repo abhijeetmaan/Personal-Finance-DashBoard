@@ -13,33 +13,40 @@ if (!mongoUri) {
   );
 }
 
-const rawClientUrl =
-  process.env.CLIENT_URL?.trim() || process.env.CORS_ORIGIN?.trim();
+/** Always allow local dev; merge production origins from env. */
+const defaultCorsOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:3000",
+  "http://localhost:4173",
+  "http://127.0.0.1:4173",
+];
+
+const fromEnv = [
+  process.env.CLIENT_URL,
+  process.env.CORS_ORIGIN,
+  process.env.CORS_EXTRA_ORIGINS,
+]
+  .filter(Boolean)
+  .flatMap((raw) => raw.split(","))
+  .map((s) => s.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
 
 let corsOrigins;
 let corsCredentials;
+/** When false, do not allow *.vercel.app unless listed in corsOrigins. */
+let corsAllowVercelSubdomains;
 
-if (rawClientUrl === "*") {
+if (fromEnv.includes("*")) {
   corsOrigins = "*";
   corsCredentials = false;
-} else if (rawClientUrl) {
-  corsOrigins = rawClientUrl
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  corsCredentials = true;
-} else if (nodeEnv !== "production") {
-  corsOrigins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:4173",
-    "http://127.0.0.1:4173",
-  ];
-  corsCredentials = true;
+  corsAllowVercelSubdomains = false;
 } else {
-  throw new Error(
-    "CLIENT_URL must be set in production (e.g. https://your-app.vercel.app). Use a comma-separated list for multiple origins.",
-  );
+  corsOrigins = [...new Set([...defaultCorsOrigins, ...fromEnv])];
+  corsCredentials = true;
+  // Allow any *.vercel.app (production + preview) unless explicitly disabled.
+  corsAllowVercelSubdomains = process.env.CORS_ALLOW_VERCEL_SUBDOMAINS !== "0";
 }
 
 export const env = {
@@ -48,4 +55,5 @@ export const env = {
   mongoUri,
   corsOrigins,
   corsCredentials,
+  corsAllowVercelSubdomains,
 };
