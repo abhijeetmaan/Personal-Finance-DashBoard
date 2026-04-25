@@ -1,25 +1,21 @@
 import { Server } from "socket.io";
 import { env } from "../config/env.js";
-import { createCorsOriginCallback } from "../utils/corsOrigin.js";
+import { createCorsOptions } from "../config/cors.js";
 
 export let io = null;
+
+const socketCorsOptions = createCorsOptions({
+  allowedOrigins: env.corsAllowedOrigins,
+  allowVercelSubdomains: env.corsAllowVercelSubdomains,
+});
 
 export const initSocket = (httpServer) => {
   if (io) return io;
 
-  const socketCors =
-    env.corsOrigins === "*"
-      ? { origin: "*", credentials: false }
-      : {
-          origin: createCorsOriginCallback(env.corsOrigins, {
-            allowVercelSubdomains: env.corsAllowVercelSubdomains,
-          }),
-          credentials: true,
-        };
-
   io = new Server(httpServer, {
     cors: {
-      ...socketCors,
+      origin: socketCorsOptions.origin,
+      credentials: socketCorsOptions.credentials,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     },
   });

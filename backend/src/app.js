@@ -4,7 +4,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
 import { env } from "./config/env.js";
-import { createCorsOriginCallback } from "./utils/corsOrigin.js";
+import { createCorsOptions } from "./config/cors.js";
 import alertsRoutes from "./routes/alerts.routes.js";
 import accountsRoutes from "./routes/accounts.routes.js";
 import cardsRoutes from "./routes/cards.routes.js";
@@ -31,38 +31,14 @@ app.use(
   }),
 );
 
-const corsOptions =
-  env.corsOrigins === "*"
-    ? {
-        origin: "*",
-        credentials: false,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
-        allowedHeaders: [
-          "Content-Type",
-          "Authorization",
-          "Accept",
-          "Origin",
-          "X-Requested-With",
-        ],
-        optionsSuccessStatus: 204,
-      }
-    : {
-        origin: createCorsOriginCallback(env.corsOrigins, {
-          allowVercelSubdomains: env.corsAllowVercelSubdomains,
-        }),
-        credentials: true,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
-        allowedHeaders: [
-          "Content-Type",
-          "Authorization",
-          "Accept",
-          "Origin",
-          "X-Requested-With",
-        ],
-        optionsSuccessStatus: 204,
-      };
+const corsOptions = createCorsOptions({
+  allowedOrigins: env.corsAllowedOrigins,
+  allowVercelSubdomains: env.corsAllowVercelSubdomains,
+});
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(env.nodeEnv === "production" ? "combined" : "dev"));

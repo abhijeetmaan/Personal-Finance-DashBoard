@@ -1,3 +1,6 @@
+/**
+ * HTTP server entry. CORS runs inside `app.js` (before JSON parser and routes).
+ */
 import dotenv from "dotenv";
 import { createServer } from "node:http";
 import app from "./app.js";
@@ -14,12 +17,8 @@ const startServer = async () => {
     initSocket(httpServer);
 
     httpServer.listen(env.port, () => {
-      const corsNote =
-        env.corsOrigins === "*"
-          ? "CORS: *"
-          : `CORS: ${env.corsOrigins.length} allowlist + vercel.app=${env.corsAllowVercelSubdomains}`;
       console.log(
-        `API listening on port ${env.port} (${env.nodeEnv}) — health: /api/v1/health — ${corsNote}`,
+        `API listening on port ${env.port} (${env.nodeEnv}) — health: /api/v1/health — CORS allowlist: ${env.corsAllowedOrigins.length} origins, vercel.app: ${env.corsAllowVercelSubdomains}`,
       );
     });
   } catch (error) {
