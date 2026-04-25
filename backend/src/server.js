@@ -18,7 +18,7 @@ const startServer = async () => {
 
     httpServer.listen(env.port, () => {
       console.log(
-        `API listening on port ${env.port} (${env.nodeEnv}) — health: /api/v1/health — CORS allowlist: ${env.corsAllowedOrigins.length} origins, vercel.app: ${env.corsAllowVercelSubdomains}`,
+        `API listening on port ${env.port} (${env.nodeEnv}) — health: /api/v1/health`,
       );
     });
   } catch (error) {

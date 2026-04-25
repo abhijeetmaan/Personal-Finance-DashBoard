@@ -4,7 +4,6 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
 import { env } from "./config/env.js";
-import { createCorsOptions } from "./config/cors.js";
 import alertsRoutes from "./routes/alerts.routes.js";
 import accountsRoutes from "./routes/accounts.routes.js";
 import cardsRoutes from "./routes/cards.routes.js";
@@ -31,13 +30,29 @@ app.use(
   }),
 );
 
-const corsOptions = createCorsOptions({
-  allowedOrigins: env.corsAllowedOrigins,
-  allowVercelSubdomains: env.corsAllowVercelSubdomains,
-});
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://personal-finance-dash-board.vercel.app",
+].filter(Boolean);
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        console.log("Allowed origin:", origin);
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS blocked: " + origin));
+    },
+    credentials: true,
+  }),
+);
+
+app.options("*", cors());
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));

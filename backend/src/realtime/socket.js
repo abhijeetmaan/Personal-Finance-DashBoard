@@ -1,21 +1,24 @@
 import { Server } from "socket.io";
-import { env } from "../config/env.js";
-import { createCorsOptions } from "../config/cors.js";
 
 export let io = null;
 
-const socketCorsOptions = createCorsOptions({
-  allowedOrigins: env.corsAllowedOrigins,
-  allowVercelSubdomains: env.corsAllowVercelSubdomains,
-});
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://personal-finance-dash-board.vercel.app",
+].filter(Boolean);
 
 export const initSocket = (httpServer) => {
   if (io) return io;
 
   io = new Server(httpServer, {
     cors: {
-      origin: socketCorsOptions.origin,
-      credentials: socketCorsOptions.credentials,
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error("CORS blocked: " + origin));
+      },
+      credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     },
   });
@@ -50,3 +53,4 @@ export const emitTransactionDeleted = (payload) => {
 export const emitBudgetUpdated = (budget) => {
   emitEvent("budgetUpdated", budget);
 };
+
